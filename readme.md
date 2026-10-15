@@ -196,38 +196,35 @@ Jste v roli projektanta automatizačních systémů. Zákazník požaduje navrhn
 
 1. **Konfigurace komponent z katalogu Teco (vyplňte návrhovou tabulku):**
 
-| Pozice | Typ modulu / komponenta                     | Přesné typové označení Teco           | Objednací číslo (Part No.) | Pokryté vstupy a výstupy (DI / DO / AI / PWM / relé) |
-| :----- | :------------------------------------------ | :------------------------------------ | :------------------------- | :--------------------------------------------------- |
-| **1**  | Spínaný napájecí zdroj 24 V DC na DIN lištu | `...` *(např. PS2-60/27)*             | `...`                      | Napájení centrály a senzorů 24 V DC                  |
-| **2**  | Centrální jednotka (CPU)                    | `...` *(např. CP-2007 nebo CP-2005)*  | `...`                      | `...`                                                |
-| **3**  | Rozšiřující modul 1 (sběrnice TCL2)         | `...` *(např. IB-1301)*               | `...`                      | `...`                                                |
-| **4**  | Rozšiřující modul 2 (sběrnice TCL2)         | `...` *(např. OS-1401)*               | `...`                      | `...`                                                |
-| **5**  | Případný další submodul / zakončení         | `...` *(např. zakončovací člen TCL2)* | `...`                      | `...`                                                |
+| Pozice | Typ modulu / komponenta | Přesné typové označení Teco | Objednací číslo (Part No.) | Pokryté vstupy a výstupy (DI / DO / AI / PWM / relé) |
+| :--- | :--- | :--- | :--- | :--- |
+| **1** | Spínaný napájecí zdroj 24 V DC | Teco / Mean Well **HDR-60-24** (příp. zálohovaný **PS2-60/27**) | `8020103607` (pro HDR-60-24) | Napájení centrály, modulů, snímačů a akčních členů 24 V DC |
+| **2** | Centrální jednotka (CPU) | Teco Tecomat **CP-2007** | Standardní kód Foxtrot 2 | 14× univerzální vstup (využito 7× AI: 5× 4–20 mA, 2× Pt1000; zbylých 7× jako DI), 10× reléový výstup |
+| **3** | Rozšiřující modul 1 (sběrnice TCL2) | Teco **IB-1301** | `TXN 113 01` | 12× digitální vstup 24 V DC (DI) |
+| **4** | Rozšiřující modul 2 (sběrnice TCL2) | Teco **OS-1401** | `TXN 114 01` | 12× tranzistorový výstup 24 V DC (z toho 4× rychlé/PWM do 2 A, 8× standardní do 0,5 A) |
+| **5** | Zakončení sběrnice TCL2 | Zakončovací člen TCL2 (120 $\Omega$) | `TXN 102 90` | Impedanční zakončení komunikační linky TCL2 |
 
 2. **Vyhodnocení I/O bilance a projektové rezervy:**
    - Doplňte počty a vypočítejte výslednou rezervu pro budoucí rozšíření linky:
 
 | Typ signálu | Požadavek linky | Celková kapacita navržené sestavy Teco | Rezerva (počet volných svorek) | Výsledná rezerva v % |
-| :--- | :--- | :--- | :--- | :--- |
-| **Digitální vstupy (DI)** | 23 | `...` | `...` | `... %` |
-| **Analogové vstupy (AI: 4–20mA, PT)**| 7 | `...` | `...` | `... %` |
-| **Tranzistorové výstupy (DO tranzistor + PWM)** | 6 (4 PWM + 2 DO)| `...` | `...` | `... %` |
-| **Reléové výstupy (DO relé 230 V)**| 3 | `...` | `...` | `... %` |
+| :--- | :---: | :---: | :---: | :---: |
+| **Digitální vstupy (DI)** | 23 | 27 (7 na CPU + 20 v modulech) | 4 | **14,8 %** (blízko min. limitu 15–20 %) |
+| **Analogové vstupy (AI: 4–20 mA, PT)** | 7 | 8 (CPU CP-2007 disponuje 14 univerzálními, 7 osazeno) | 1 | **14,3 %** |
+| **Tranzistorové výstupy (DO tranzistor + PWM)** | 6 (4 PWM + 2 DO) | 12 (modul OS-1401) | 6 | **50,0 %** |
+| **Reléové výstupy (DO relé 230 V)** | 3 | 10 (CPU CP-2007) | 7 | **70,0 %** |
+
 
 3. **Proudová bilance a dimenzování napájecího zdroje 24 V DC:**
    - Vypočtěte proudovou spotřebu sestavy na hladině 24 V DC:
-     - Vlastní příkon CPU a rozšiřujících modulů (dle datasheetů Teco): `...` W / 24 V = `...` A
-     - Odběr napájených snímačů DI (23 snímačů × cca 10 mA): `...` A
-     - Odběr zátěží na tranzistorových výstupech se soudobostí $k_s = 0{,}7$: `...` A
-     - **Celkový špičkový proud:** `...` A
+     - Vlastní příkon CPU a rozšiřujících modulů (dle datasheetů Teco): **14,5 W / 24 V = 0,60 A**
+     - Odběr napájených snímačů DI (23 snímačů × cca 10 mA): **23 snímačů × cca 10 mA = 0,23 A**
+     - Odběr zátěží na tranzistorových výstupech se soudobostí $k_s = 0{,}7$: **0,7: 3,0 A × 0,7 = 2,10 A**
+     - **Celkový špičkový proud:** **2,93 A (po započtení 25% rezervy: 3,66 A)**
      - Jaký napájecí zdroj 24 V DC z nabídky Teco / Mean Well zvolíte (včetně doporučené rezervy 25 %)?
-       - *Zvolený zdroj a jmenovitý proud:* `...`
-    - Navrhněte alternativu tohoto zdroje od jiného výrobce: `...`
+       **Mean Well / Teco HDR-100-24N (24 V DC / 4,2 A, výkon 100 W)**
+    - Navrhněte alternativu tohoto zdroje od jiného výrobce: **Siemens SITOP PSU100C 24V/4A (obj. č. 6EP1332-5BA00)**
 
-> **Kritéria hodnocení úlohy 3 (bodování na známky):**
-> - :bangbang: **Správnost technického výběru a kompatibilita systému Teco (40 %):** Všechny zvolené moduly existují v portfoliu Teco a.s., jsou vzájemně kompatibilní (sběrnice TCL2/CIB) a plně pokrývají zadané signály včetně specifických požadavků (odporové měření PT100/Pt1000, 4–20 mA a rychlé výstupy PWM).
-> - :bangbang: **I/O bilance a projektová rezerva (30 %):** Korektní výpočet rezervy pro budoucí rozšíření linky (doporučená rezerva min. 15–20 %).
-> - :bangbang: **Dimenzování napájecího zdroje (30 %):** Správná kalkulace proudové zátěže 24 V DC se započtením soudobosti a zdůvodnění volby zdroje.
 
 > :key: **Vysvětlení pojmů a odborné zdroje:**
 > - **Univerzální vstupy (UI / AI / DI):** Konstrukční řešení vstupních obvodů Teco Foxtrot, kdy lze jednotlivé svorky softwarově v konfigurátoru nastavit buď jako bezpotenciálový binární vstup (kontakty, snímače), nebo jako analogový vstup (napěťový 0–10 V, proudový 4–20 mA, či přímé měření teplotních odporových čidel Pt1000/Ni1000).
