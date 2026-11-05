@@ -458,6 +458,7 @@ END_PROGRAM
    | **Porucha motoru (termistorové relé)** | `di_HladinaPump=1`, **`di_Porucha=0`** | `do_Cerpadlo=0`, `do_Alarm=1` | `...` |
    | **Reset alarmu** | Po stisku `btn_Reset`, porucha i přepad odstraněny | `do_Alarm=0`, `b_HavarieDetekce=0` | `...` |
 
+
 4. **Propojení teorie s výsledky simulace:**
    - Proč proměnná `b_HavarieDetekce` musí být deklarována jako `RETAIN`? Co by se stalo při výpadku napájení PLC, kdyby nebyla uložena v remanentní paměti?
      - *Vaše odpověď:* `...`
