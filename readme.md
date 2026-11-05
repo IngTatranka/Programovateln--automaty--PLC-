@@ -270,36 +270,69 @@ Jste v roli servisního inženýra na lince řízené automatem **Tecomat Foxtro
 | Signalizační prvek na PLC | Stav (barva / svit)     | Provozní význam (co stav znamená pro servisního technika)   |
 | :------------------------ | :---------------------- | :---------------------------------------------------------- |
 | **RUN**                   | Zelená, trvale svítí    | Uživatelský program v PLC běží v normálním cyklickém režimu |
-| **HALT / STOP**           | Žlutá / oranžová, svítí | `...`                                                       |
-| **ERR / FAULT**           | Červená, bliká          | `...`                                                       |
-| **ERR / FAULT**           | Červená, trvale svítí   | `...`                                                       |
-| **ETH (Link/Act)**        | Zelená/žlutá, bliká     | `...`                                                       |
+| **HALT / STOP**           | Žlutá / oranžová, svítí | Program je zastaven, ať ručně z Mosaicu, po chybě, nebo protože v PLC žádný program není. Procesní obraz se neaktualizuje a výstupy přejdou do definovaného stavu (typicky vypnuto). Čerpadlo tedy nemůže reagovat, což odpovídá zadané situaci.|
+| **ERR / FAULT**           | Červená, bliká          | Systém zaznamenal chybu, ale PLC dál pracuje nebo je v režimu s omezením. Typicky jde o výpadek či nekomunikující modul na TCL2, chybu konfigurace nebo běhovou chybu programu. Následuje kontrola logu v Mosaicu. |
+| **ERR / FAULT**           | Červená, trvale svítí   |Závažná (fatální) chyba. Může jít o poškozený program či konfiguraci, HW závadu CPU, nebo chybu napájení či paměti. PLC většinou nejde spustit a je nutný restart, nový download projektu nebo servisní zásah.|
+| **ETH (Link/Act)**        | Zelená/žlutá, bliká     |Ethernetové rozhraní je aktivní, fyzicky probíhá přenos dat (komunikace s Mosaicem, SCADA, PLC-PLC).|
 
 2. **Troubleshooting v elektrickém zapojení pomocí digitálního multimetru:**
    - Upevněte na DIN lištu PLC a podle parametrů (viz technický list) vyberte vhodný zdroj napájení.
    - Zapojte napájení PLC (než zapojíte 230 V AC zapojení proměřte).
    - Popište přesný a bezpečný metodický postup (kam připojíte měřicí hroty, jaký rozsah a veličinu na multimetru nastavíte; alespoň některé varianty bezpečně nasimulovat na PLC a zdroji, nejspíš budete potřebovat navázat komunikaci s programovacím prostředím, založit program a HW konfiguraci, abyste mohli ovládat výstupy a číst vstupy):
      - **A. Detekce tvrdého zkratu mezi svorkami +24 V DC a 0 V (GND) před zapnutím jističe:**
-       - *Postup:* `...` *(pozor: zařízení musí být zcela bez napětí, měření impedance/kontinuity)*
+       - *Postup:* Vypněte jistič, zajistěte ho proti zapnutí a odpojte zdroj od sítě. Ověřte, že na svorkách není napětí.
+Multimetr nastavte na kontinuitu (zvukový test) nebo na Ω.
+Hroty připojte na svorky +24 V a 0 V (u PLC napájení nebo na výstupu zdroje, odpojeného od PLC).
+Výsledek: odpor blízký 0 Ω nebo trvalý pípák značí zkrat. Nízký, ale nenulový odpor může být normální vstupní impedance zátěže (kondenzátory zdroje se krátce nabíjejí, takže údaj nejdřív klesá a pak roste). Vysoká hodnota až OL značí, že zkrat není.
+Při zkratu měření opakujte po částech: odpojujte větve a moduly a hledejte vadný úsek.
      - **B. Ověření spečených kontaktů výstupního relé DO při vypnutém napájení řízení:**
-       - *Postup:* `...`
+       - Odpojte napájení řízení i zátěže a ověřte beznapěťový stav.
+Odpojte vodiče zátěže od svorek výstupu, aby se neměřila zátěž.
+Multimetr dejte na kontinuitu nebo Ω.
+Hroty připojte na svorky kontaktu relé (společná svorka COM a výstup).
+Při vypnutém výstupu (cívka bez proudu) mají být kontakty rozepnuté, tedy OL. Naměříte-li téměř 0 Ω, jsou kontakty spečené.
+Pro srovnání v Mosaicu zapněte výstup. Po sepnutí by měl být odpor téměř 0 Ω (jednotky ohmů a méně). Poté výstup vypněte a ověřte, že se kontakt rozepne.
+Příčinou bývá nedostatečné odrušení indukční zátěže (RC člen, varistor, dioda) nebo proudový náraz při spínání.
      - **C. Diagnostika napájecího zdroje a napájení PLC (ověření správného napětí 24 V DC):**
-	   - *Postup:* `...` *(zařízení pod napětím, měření stejnosměrného napětí – hroty na svorkách zdroje / PLC napájení +24 V a 0 V, vhodný rozsah DC napětí, kontrola ripple/stability)*
+	   - *Postup:* Zařízení je pod napětím. Multimetr nastavte na V DC, rozsah např. 200 V nebo autorange.
+Černý hrot dejte na 0 V (GND) a červený na +24 V, nejprve na výstup zdroje a potom na napájecí svorky PLC.
+Normální hodnota je podle tolerance zdroje a PLC přibližně 24 V DC, s ohledem na úbytek napětí v kabelech. Rozdíl mezi zdrojem a PLC ukazuje na úbytek v kabelu, špatný kontakt nebo přetížení.
+Ověřte stabilitu zatížení sledováním údaje při zapnutí větších zátěží. Pokles napětí značí přetížený nebo slabý zdroj.
+Ripple multimetr ve standardním DC režimu neukáže. Použijte osciloskop, nebo orientačně AC režim v mV, kde ale většina multimetrů nemá dostatečné pásmo.
 	- **D. Diagnostika vstupů a výstupů PLC (ověření napětí / kontinuity na DI/DO):**
-       - *Postup:* `...` *(podle typu – měření napětí na aktivovaném vstupu/výstupu nebo kontinuity/impedance při vypnutém napájení, hroty na příslušných svorkách I/O a referenční GND)*
+       - *Postup:* Černý hrot na 0 V (GND vstupního modulu), červený na svorku vstupu.
+Multimetr na V DC. Neaktivní stav dává asi 0 V, aktivní asi 24 V.
+Porovnejte s LED vstupu a hodnotou v Mosaicu (Watch).
+Rozdíl ukazuje na chybu: LED svítí a v Mosaicu je 0 → chyba modulu nebo konfigurace; napětí na svorce není → snímač, kabel.
+
+Digitální výstup tranzistorový (pod napětím):
+
+Zapněte výstup z Mosaicu přes zápis proměnné.
+Měřte napětí mezi svorkou výstupu a 0 V. Nezatížený výstup může vykazovat falešné napětí, takže měřte při připojené zátěži.
+
+Výstup relé nebo kontinuita (bez napětí):
+
+Postup jako v bodě B.
+
+Analogové vstupy:
+
+Napětí 0–10 V měřte jako V DC na vstupní svorce.
+Proud 4–20 mA měřte v sérii, viz tip níže.
     - **E. Měření napětí 230 V AC pomocí DC rozsahu (!!! Tento úkol provádějte pouze s vyučujícím !!!):**
-	   - *Postup:* `...` *(zařízení pod napětím, multimetr nastaven na rozsah **1000 V DC**, hroty bezpečně připojeny na fázový a nulový vodič / L–N. Multimetr měří střední hodnotu, proto ukáže přibližně **0 V**.)*
-	   - *Jaké riziko z toho vyplývá při následné práci na zařízení:* `...`
+	   - *Postup:* Multimetr nastavte na 1000 V DC a hroty připojte na L a N.
+Multimetr měří střední hodnotu, která je u sinusového průběhu přibližně 0 V. Ukáže tedy zhruba 0 V, i když je síť pod napětím. *(zařízení pod napětím, multimetr nastaven na rozsah **1000 V DC**, hroty bezpečně připojeny na fázový a nulový vodič / L–N. Multimetr měří střední hodnotu, proto ukáže přibližně **0 V**.)*
+	   - *Jaké riziko z toho vyplývá při následné práci na zařízení:* 
+	   Technik může usoudit, že obvod je bez napětí, a dotknout se živých částí
 
 3. **Diagnostika v programovacím prostředí Teco Mosaic:**
    - K jakému diagnostickému účelu slouží níže uvedené nástroje prostředí Mosaic a jaká jsou jejich bezpečnostní rizika:
      - **Nástroj Watch / Sledování proměnných (Inspektor):**
-       - *Účel:* `...`
+       - *Účel:* **Online zobrazuje hodnoty proměnných, vstupů a výstupů, registrů a stavů programu v běžícím PLC. Umožňuje je i měnit. Slouží k ověření logiky programu, ke zjištění stavu I/O a k hledání příčin chyb.**
      - **Funkce Force (Vnucení hodnoty vstupu / výstupu):**
-       - *Co přesně funkce provede:* `...`
-       - :warning: **Provozní a bezpečnostní riziko funkce Force:** Proč je použití funkce Force během ostrého provozu s přítomností lidské obsluhy zakázáno? `...`
+       - *Co přesně funkce provede:* **Zamkne hodnotu proměnné nebo I/O v procesním obrazu na zvolenou úroveň, bez ohledu na fyzický stav svorky a bez ohledu na program. Běžný zápis proměnné se při dalším cyklu přepíše programem, kdežto Force trvá, dokud není zrušen.**
+       - :warning: **Provozní a bezpečnostní riziko funkce Force:** Proč je použití funkce Force během ostrého provozu s přítomností lidské obsluhy zakázáno? **Použití funkce Force během ostrého provozu obchovává fyzické bezpečnostní blokování, koncové spínače, nouzová zastavení (E-STOP) a reálné stavy snímačů. Může dojít k neočekávanému spuštění pohonů, zranění lidské obsluhy nebo těžkému poškození technologie.**
      - **Systémový diagnostický log (Chybový protokol PLC v Mosaicu):**
-       - *Jaké informace v něm technik vyčte:* `...` *(např. restart CPU, výpadek sběrnice TCL2, chyba dělení nulou)*
+       - *Jaké informace v něm technik vyčte:* **Časovou chronologii systémových událostí, záznamy o restartech CPU, výpadcích sběrnic (např. TCL2, CIB), chybách běhu programu (runtime errors, jako je dělení nulou nebo překročení indexu pole), či nesnázích s hardwarovou konfigurací.**
 
 > **Kritéria hodnocení úlohy 4 (bodování na známky):**
 > - :bangbang: **Odborná správnost interpretace stavů a hlášení PLC (30 %):** Bezchybné vysvětlení indikace LED (RUN, HALT, ERR) a práce s diagnostickým hlášením v prostředí Mosaic.
@@ -323,7 +356,7 @@ Jste v roli servisního inženýra na lince řízené automatem **Tecomat Foxtro
 Co se stane v řídicím systému Tecomat Foxtrot, pokud na sběrnici TCL2 omylem nastavíte dvěma různým periferním modulům stejnou hardwarovou adresu (např. otočným přepínačem adresy), a jak tuto kolizi indikuje centrální jednotka v diagnostice?
 
 *Vaše odpověď:*
-`...`
+**pokud mají dva moduly na sběrnici TCL2 nastavenou stejnou hardwarovou adresu, dojde ke komunikační kolizi, výpadkům v komunikaci a chybovým hlášením v diagnostice prostředí Mosaic.**
 
 ---
 
