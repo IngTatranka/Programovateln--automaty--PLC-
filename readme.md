@@ -243,7 +243,7 @@ Jste v roli projektanta automatizačních systémů. Zákazník požaduje navrhn
 Jaký je princip zapojení odporového snímače teploty (např. Pt1000) a proč je pro přesné měření na velké vzdálenosti vhodnější použít snímač Pt1000 než Pt100, pokud máme k dispozici pouze standardní 2vodičové vedení?
 
 *Vaše odpověď:*
-`...`
+**Pt1000 má 10x větší odpor a tedy proud je 10x menší a to znamená 10x menší ztráty na teplu na kabelu. Změna odporu na 1 stupeň je místo 0,3 ohm 3,1 ohm což je větší změna. Odpor 1000 ohm je mnohem větší než odpor kabelu 500m a tedy stačí jen 2 vodiče.**
 
 ---
 
