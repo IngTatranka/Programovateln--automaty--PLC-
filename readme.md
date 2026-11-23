@@ -508,11 +508,6 @@ END_PROGRAM
 	**Důsledek bez RETAIN: Pokud by proměnná nebyla RETAIN a došlo k výpadku proudu během havárie, po znovunáběhu napájení by se proměnná resetovala na výchozí stav FALSE. Havarijní stav by byl nepozorovaně smazán bez 		vědomí obsluhy, zhasnul by alarm a neproběhla by nutná kontrola jímky/objektu techniky.**
 
 
-   - Sledujte v okně Watch hodnotu `timer_TOF.ET` (elapsed time) během odpočtu 10 sekund. K čemu slouží tato hodnota z pohledu diagnostiky v praxi?
-     - *Vaše odpověď:* `...`
-   - Jakým způsobem byste pomocí funkce **Force** v Mosaicu nasimulovali výpadek ochrany motoru (`di_Porucha = FALSE`) bez fyzického přepojení svorky? Popište postup a uveďte bezpečnostní riziko:
-     - *Postup Force:* `...`
-     - *Bezpečnostní riziko při použití Force v ostrém provozu:* `...`
 
 > **Kritéria hodnocení úlohy 5 (bodování na známky):**
 > - :bangbang: **Správný postup práce v simulátoru Mosaic (25 %):** Správně popsané kroky pro aktivaci simulátoru, přiřazení I/O a spuštění online monitoringu (Watch).
